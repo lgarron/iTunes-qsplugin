@@ -61,6 +61,7 @@
 /* End PBXBuildRule section */
 
 /* Begin PBXFileReference section */
+		0D46243415B98B43008B7A32 /* iTunes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iTunes.h; sourceTree = "<group>"; };
 		7FA20E780C6E4F0F00630971 /* QSiTunesDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QSiTunesDefines.h; sourceTree = "<group>"; };
 		8D1AC9740486D14A00FE50C9 /* iTunes Module.qsplugin */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iTunes Module.qsplugin"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D404BE071472C83200B570AF /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
@@ -177,6 +178,7 @@
 		E1DAFACF07007BA400FAFE2A /* Code */ = {
 			isa = PBXGroup;
 			children = (
+				0D46243415B98B43008B7A32 /* iTunes.h */,
 				E1B9FA0F07A2C76300B4017B /* QSiTunesBridge.h */,
 				E1B9FA1007A2C76300B4017B /* QSiTunesBridge.m */,
 				E1B9F7ED07A2B21A00B4017B /* QSiTunesActionProvider.h */,

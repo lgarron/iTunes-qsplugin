@@ -226,6 +226,35 @@
 	return nil;
 }
 
+- (QSObject *)revealTrack:(QSObject *)dObject inPlaylist:(QSObject *)iObject
+{
+  NSArray *paths = [dObject validPaths];
+  
+  NSDictionary *errorDict = nil;
+  
+  // get iTunesTrack objects to represent each track
+  NSArray *trackResult = [self trackObjectsFromQSObject:dObject];
+  NSArray *newTracks = [trackResult valueForKey:@"location"];
+  
+  if (!paths) {
+    // get the location from the track object(s)
+    paths = [newTracks arrayByPerformingSelector:@selector(path)];
+  }
+  
+  NSString *playlist = [[self playlistObjectFromQSObject:iObject] name];
+  
+  if (playlist && paths) {
+    
+    [iTunes activate];
+    NSLog(@"Playlist: %@", playlist);
+    [[self iTunesScript] executeSubroutine:@"reveal_track_in_playlist" arguments:[NSArray arrayWithObjects:[NSAppleEventDescriptor aliasListDescriptorWithArray:paths], playlist, nil] error:&errorDict];
+    if (errorDict) {NSLog(@"Error: %@", errorDict);}
+  }
+  
+  return nil;
+}
+
+// TODO: Reveal in [dObject objectForMeta:@"QSiTunesSourcePlaylist"], if not nil
 - (QSObject *)revealItem:(QSObject *)dObject
 {
 	[iTunes activate];
@@ -305,12 +334,58 @@
 	return [NSArray arrayWithObjects:kQSiTunesPSPlayNextAction, kQSiTunesPSAddAction, kQSiTunesPSPlayAction, kQSiTunesPlayItemAction, nil];
 }
 
+//TODO: This is very slow. It takes about 20 seconds to go through all of my 334 playlists like this.
+- (BOOL)playlist:(QSObject *)qsplaylist containsTrackWithName:(NSString *)trackName
+{
+  //NSLog(@"Searching for track named \"%@\" in playlist \"%@\".", trackName, playlistName);
+  
+  iTunesPlaylist *playlist = [self playlistObjectFromQSObject: qsplaylist];
+  iTunesTrack *tracksInPlaylist = [playlist searchFor:trackName only:iTunesESrASongs];
+  
+  
+  if ([tracksInPlaylist lastObject]) {
+    // Get the playlist name for debugging.
+    NSString *playlistName = [playlist name];
+    NSLog(@"Found track named \"%@\" in playlist \"%@\".", trackName, playlistName);
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+- (NSArray *)playlistsContainingTrack:(QSObject *)dObject
+{
+  
+  NSArray *tracks = [self trackObjectsFromQSObject:dObject];
+  iTunesTrack *track = [tracks lastObject];
+  NSString *trackName = [track name];
+  
+  NSArray *allPlaylists = [QSLib arrayForType:QSiTunesPlaylistIDPboardType];
+  
+  NSUInteger numPlaylists = [allPlaylists count];
+  NSLog(@"Searching for track \"%@\" in %lu playlists.", trackName, ((unsigned long)numPlaylists));
+  
+  NSMutableArray *playlistsContainingTrack = [NSMutableArray arrayWithCapacity: 1];
+  
+  for (id playlist in allPlaylists) {
+    if ([self playlist:playlist containsTrackWithName:trackName]) {
+      [playlistsContainingTrack addObject: playlist];
+    }
+  }
+  
+  return playlistsContainingTrack;
+}
+
 - (NSArray *)validIndirectObjectsForAction:(NSString *)action directObject:(QSObject *)dObject
 {
-	if ([action isEqualToString:@"QSiTunesAddToPlaylistAction"]) {
-		return [QSLib arrayForType:QSiTunesPlaylistIDPboardType];
-	}
-	return nil;
+  if ([action isEqualToString:@"QSiTunesAddToPlaylistAction"]) {
+    return [QSLib arrayForType:QSiTunesPlaylistIDPboardType];
+  }
+  else if ([action isEqualToString:@"QSiTunesRevealInPlaylistAction"]) {
+    return [self playlistsContainingTrack: dObject];
+  }
+  return nil;
 }
 
 #pragma mark - Internal helper methods

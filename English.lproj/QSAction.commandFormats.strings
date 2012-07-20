@@ -4,6 +4,7 @@
 "QSiTunesPSAddAction" = "Add %@ to End of iTunes DJ";
 "QSiTunesAddToPlaylistAction" = "Add %@ to Playlist…";
 "QSiTunesRevealItem" = "Reveal %@ in iTunes";
+"QSiTunesRevealInPlaylistAction" = "Reveal %@ in Playlist…";
 "QSiTunesOpenBookletAction" = "Open Booklet(s) for %@";
 "QSiTunesGetLyrics" = "Get Lyrics for %@";
 "QSiTunesToggleShuffle" = "Toggle Shuffle for %@";
