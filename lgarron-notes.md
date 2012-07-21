@@ -7,6 +7,7 @@ July 20, 2012
 - We only care about a single song in the fist pane. Make sure sane behaviour (i.e. no crashing) happens for multiple songs or playlists in the first pane.
 - Third pane should offer playlists containing the song in the first pane.
   - Right-arrowing could be conceivably be convenient, but it's probably better to disable that and only allow a list of playlists to be filtered. (Doesn't seem possible? The "Move To" action doesn't prevent the QS interface from letting you try to move into a file instead of a folder.)
+  - The default selection in the third pane should be the playlist of the direct object, if there is one. It woul dbe nice if this were possible without rearranging the results (that way, playlists ni the third pane always appear in order).
 - An action to get the playlists of a song in the first pane (there has to be a good name for this).
 - Use song IDs when possible, since some titles are identical
 - Resolve proxies
@@ -15,6 +16,6 @@ July 20, 2012
 - "Reveal Item" for a song navved in from a playlist should probably reveal in the playlist (same as playing).
 - Application Action for "Reveal Currently Playing Song"
 - Document new actions.
-
+- Garbage collection?
 
 - Song-Playlist combination that doesn't work (although it works with other playlists, including other smart playlists): Test Drive (Waltz v0.1) (Reveal in Playlist…)  Movie Music Playlist

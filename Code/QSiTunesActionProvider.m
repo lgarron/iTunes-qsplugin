@@ -334,43 +334,55 @@
 	return [NSArray arrayWithObjects:kQSiTunesPSPlayNextAction, kQSiTunesPSAddAction, kQSiTunesPSPlayAction, kQSiTunesPlayItemAction, nil];
 }
 
-//TODO: This is very slow. It takes about 20 seconds to go through all of my 334 playlists like this.
-- (BOOL)playlist:(QSObject *)qsplaylist containsTrackWithName:(NSString *)trackName
+//TODO: Is it okay to use "with" even if this doesn't create an object? (It just looks one up.)
+- (QSObject *)findInPlaylists:(NSArray *)qsPlaylists playlistWithPersistentID:(NSString *)persistentID
 {
-  //NSLog(@"Searching for track named \"%@\" in playlist \"%@\".", trackName, playlistName);
-  
-  iTunesPlaylist *playlist = [self playlistObjectFromQSObject: qsplaylist];
-  iTunesTrack *tracksInPlaylist = [playlist searchFor:trackName only:iTunesESrASongs];
-  
-  
-  if ([tracksInPlaylist lastObject]) {
-    // Get the playlist name for debugging.
-    NSString *playlistName = [playlist name];
-    NSLog(@"Found track named \"%@\" in playlist \"%@\".", trackName, playlistName);
-    return true;
+  //TODO Actual Search.
+  for (id qsPlaylist in qsPlaylists) {
+    
+    NSString *qsPlaylistID = [qsPlaylist identifier];
+    BOOL eq = [persistentID isEqualTo: qsPlaylistID];
+    
+    if (eq) {
+      //NSLog(@"Persistent ID: %@ (%@), playlist ID: %@, equal: %@", persistentID, [qsPlaylist name], qsPlaylistID, eq ? @"YES" : @"NO");
+      return qsPlaylist;
+    }
   }
-  else {
-    return false;
-  }
+  return nil;
 }
 
+/*
+ * This method enumerates playlists using iTunes, because that's way faster.
+ * This can then be matched up with a QSiTunesPlaylistIDPboardType object.
+ */
 - (NSArray *)playlistsContainingTrack:(QSObject *)dObject
 {
   
+  // TODO: Resolve proxy dObject if needed.
   NSArray *tracks = [self trackObjectsFromQSObject:dObject];
   iTunesTrack *track = [tracks lastObject];
   NSString *trackName = [track name];
   
-  NSArray *allPlaylists = [QSLib arrayForType:QSiTunesPlaylistIDPboardType];
+  NSArray *qsPlaylists = [QSLib arrayForType:QSiTunesPlaylistIDPboardType];
   
-  NSUInteger numPlaylists = [allPlaylists count];
-  NSLog(@"Searching for track \"%@\" in %lu playlists.", trackName, ((unsigned long)numPlaylists));
+	iTunesSource *iTunesLibrary = QSiTunesLibrary();
+  SBElementArray *iTunesPlaylists = [iTunesLibrary playlists];
+  
+  NSUInteger numPlaylists = [iTunesPlaylists count];
+  //NSLog(@"Searching for track \"%@\" in %lu playlists.", trackName, ((unsigned long)numPlaylists));
   
   NSMutableArray *playlistsContainingTrack = [NSMutableArray arrayWithCapacity: 1];
-  
-  for (id playlist in allPlaylists) {
-    if ([self playlist:playlist containsTrackWithName:trackName]) {
-      [playlistsContainingTrack addObject: playlist];
+    
+  for (id iTunesPlaylist in iTunesPlaylists) {
+    
+    //TODO: Search for track ID instead.
+    iTunesTrack *tracksInPlaylist = [iTunesPlaylist searchFor:trackName only:iTunesESrASongs];
+    
+    if ([tracksInPlaylist lastObject]) {//TODO: Better way to check for non-emptiness
+      QSObject *qsPlaylist = [self findInPlaylists: qsPlaylists playlistWithPersistentID: [iTunesPlaylist persistentID]];
+      if (qsPlaylist) {
+	      [playlistsContainingTrack addObject: qsPlaylist];
+      }
     }
   }
   
