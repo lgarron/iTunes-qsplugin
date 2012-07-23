@@ -226,23 +226,29 @@
 	return nil;
 }
 
-// Due to legacy code, and possibly extensibility, this method currently accepts an array containing the track.
-- (void)revealITunesTrack:(NSArray *)tracks inITunesPlaylist:(iTunesPlaylist *)playlist
+/*
+ * Due to legacy code, and to be a bit more extensible (perhaps it's possible to reveal multiple songs in the same playlist), this method currently accepts an array containing the track.
+ * Also, it should be taking in iTunesTrack instead of a string, but this requires modifying the metadata we can get from the first pane.
+ */
+- (void)revealITunesTrack:(NSArray *)tracks inITunesPlaylistWithName:(NSString *)playlistName
 {
   
   NSDictionary *errorDict = nil;
   
   NSArray *newTracks = [tracks valueForKey:@"location"];
   NSArray *paths = [newTracks arrayByPerformingSelector:@selector(path)];
-  NSString *playlistName = [playlist name];
   
-  if (playlist && paths) {
-    [iTunes activate];
-    NSLog(@"Playlist: %@", playlistName);
-    [[self iTunesScript] executeSubroutine:@"reveal_track_in_playlist" arguments:[NSArray arrayWithObjects:[NSAppleEventDescriptor aliasListDescriptorWithArray:paths], playlistName, nil] error:&errorDict];
-  }
+  //if (playlist && paths) {
+  [iTunes activate];
+  [[self iTunesScript] executeSubroutine:@"reveal_track_in_playlist" arguments:[NSArray arrayWithObjects:[NSAppleEventDescriptor aliasListDescriptorWithArray:paths], playlistName, nil] error:&errorDict];
   
   if (errorDict) {NSLog(@"Error: %@", errorDict);}
+}
+
+- (void)revealITunesTrack:(NSArray *)tracks inITunesPlaylist:(iTunesPlaylist *)playlist
+{
+  NSString *playlistName = [playlist name];
+  [self revealITunesTrack: tracks inITunesPlaylistWithName: playlistName];
 }
 
 - (QSObject *)revealTrack:(QSObject *)dObject inPlaylist:(QSObject *)iObject
@@ -259,13 +265,22 @@
 // TODO: Reveal in [dObject objectForMeta:@"QSiTunesSourcePlaylist"], if not nil
 - (QSObject *)revealItem:(QSObject *)dObject
 {
+  NSLog(@"Meta: %@", [dObject objectForMeta:@"QSiTunesSourcePlaylist"]);
+  
 	[iTunes activate];
 	if ([dObject containsType:QSiTunesPlaylistIDPboardType]) {
 		[[self playlistObjectFromQSObject:dObject] reveal];
 	} else if ([dObject containsType:QSiTunesTrackIDPboardType]) {
-		NSArray *trackResult = [self trackObjectsFromQSObject:dObject];
-		iTunesTrack *track = [trackResult lastObject];
-		[track reveal];
+    NSArray *trackResult = [self trackObjectsFromQSObject:dObject];
+    iTunesTrack *track = [trackResult lastObject];
+    //Issue: the QSiTunesSourcePlaylist for a currently playing song (proxy item) is "Music".
+    NSString *playlistName = [dObject objectForMeta:@"QSiTunesSourcePlaylist"];
+    if (playlistName) {
+      [self revealITunesTrack: trackResult inITunesPlaylistWithName: playlistName];
+    }
+    else {
+      [track reveal];
+    }
 	}
 	return nil;
 }
