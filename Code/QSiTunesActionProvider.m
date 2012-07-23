@@ -226,30 +226,32 @@
 	return nil;
 }
 
-- (QSObject *)revealTrack:(QSObject *)dObject inPlaylist:(QSObject *)iObject
+// Due to legacy code, and possibly extensibility, this method currently accepts an array containing the track.
+- (void)revealITunesTrack:(NSArray *)tracks inITunesPlaylist:(iTunesPlaylist *)playlist
 {
-  NSArray *paths = [dObject validPaths];
   
   NSDictionary *errorDict = nil;
   
-  // get iTunesTrack objects to represent each track
-  NSArray *trackResult = [self trackObjectsFromQSObject:dObject];
-  NSArray *newTracks = [trackResult valueForKey:@"location"];
-  
-  if (!paths) {
-    // get the location from the track object(s)
-    paths = [newTracks arrayByPerformingSelector:@selector(path)];
-  }
-  
-  NSString *playlist = [[self playlistObjectFromQSObject:iObject] name];
+  NSArray *newTracks = [tracks valueForKey:@"location"];
+  NSArray *paths = [newTracks arrayByPerformingSelector:@selector(path)];
+  NSString *playlistName = [playlist name];
   
   if (playlist && paths) {
-    
     [iTunes activate];
-    NSLog(@"Playlist: %@", playlist);
-    [[self iTunesScript] executeSubroutine:@"reveal_track_in_playlist" arguments:[NSArray arrayWithObjects:[NSAppleEventDescriptor aliasListDescriptorWithArray:paths], playlist, nil] error:&errorDict];
-    if (errorDict) {NSLog(@"Error: %@", errorDict);}
+    NSLog(@"Playlist: %@", playlistName);
+    [[self iTunesScript] executeSubroutine:@"reveal_track_in_playlist" arguments:[NSArray arrayWithObjects:[NSAppleEventDescriptor aliasListDescriptorWithArray:paths], playlistName, nil] error:&errorDict];
   }
+  
+  if (errorDict) {NSLog(@"Error: %@", errorDict);}
+}
+
+- (QSObject *)revealTrack:(QSObject *)dObject inPlaylist:(QSObject *)iObject
+{
+  
+  // get iTunesTrack objects to represent each track
+  NSArray *trackResult = [self trackObjectsFromQSObject:dObject];
+  iTunesPlaylist *playlist = [self playlistObjectFromQSObject:iObject];
+  [self revealITunesTrack: trackResult inITunesPlaylist: playlist];
   
   return nil;
 }

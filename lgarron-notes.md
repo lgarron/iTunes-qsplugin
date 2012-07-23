@@ -20,5 +20,6 @@ July 20, 2012
 - Reversed action: Playlist > Add Track...
 - Feature: Drag-drop a song on a playlist selected in first pane to append.
 - Bug: Enable/Disable tracks toggles each track in a playlist. If a track is in a playlist an even number of times, there is no net effect on it.
+- If still using, scripting bridge, make sure to use playlist ID instead of name.
 
 - Song-Playlist combination that doesn't work (although it works with other playlists, including other smart playlists): Test Drive (Waltz v0.1) (Reveal in Playlist…)  Movie Music Playlist [First guess: Mismatch between iTunes' persistent ID for the playlist and the one stored in the catalog?]
