@@ -21,5 +21,8 @@ July 20, 2012
 - Feature: Drag-drop a song on a playlist selected in first pane to append.
 - Bug: Enable/Disable tracks toggles each track in a playlist. If a track is in a playlist an even number of times, there is no net effect on it.
 - If still using, scripting bridge, make sure to use playlist ID instead of name.
+- Issue: "Reveal in Playlist" opens iTunes to find valid indirect objects.
+- Alternate actions:
+  - Play > Reveal (should reveal in playlist if navved from playlist)
 
 - Song-Playlist combination that doesn't work (although it works with other playlists, including other smart playlists): Test Drive (Waltz v0.1) (Reveal in Playlist…)  Movie Music Playlist [First guess: Mismatch between iTunes' persistent ID for the playlist and the one stored in the catalog?]
