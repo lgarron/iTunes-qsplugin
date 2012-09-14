@@ -21,7 +21,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>2.1.6</string>
 	<key>CFBundleVersion</key>
-	<string>3E0</string>
+	<string>3E7</string>
 	<key>NSPrincipalClass</key>
 	<string>QSiTunesObjectSource</string>
 	<key>QSActions</key>
@@ -122,6 +122,8 @@
 			<string>QSiTunesActionProvider</string>
 			<key>actionSelector</key>
 			<string>playItem:</string>
+			<key>alternateAction</key>
+			<string>QSiTunesRevealItem</string>
 			<key>directTypes</key>
 			<array>
 				<string>com.apple.itunes.track</string>
